@@ -999,10 +999,12 @@
 
             /* 스텝 리스트 — 가로 3분할 */
             .step-list {
-                flex-direction: row !important;
-                gap: 8px !important;
-                align-items: stretch !important;
-                justify-content: center !important;
+               flex-direction: row !important; /* 가로 배열은 유지하되 */
+    gap: 8px !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+    width: 100% !important; /* 전체 너비를 확보 */
+    box-sizing: border-box !important;
             }
             .step-item {
                 flex: 1 !important;
@@ -1024,6 +1026,11 @@
             }
             .step-text {
                 text-align: center !important;
+                word-break: keep-all;     /* 한글 단어 단위 줄바꿈 (가독성 향상) */
+    overflow-wrap: break-word; /* 긴 텍스트 강제 줄바꿈 (잘림 방지 핵심) */
+    white-space: normal;      /* 텍스트가 한 줄로 밀리지 않게 설정 */
+    display: block !important; /* 블록 요소로 확실히 지정 */
+    width: 100%;
             }
             .step-text strong {
                 font-size: 0.80rem !important;
@@ -1032,9 +1039,10 @@
                 font-weight: 800 !important;
             }
             .step-text span {
-                font-size: 0.67rem !important;
-                color: rgba(255,230,180,0.90) !important;
-                line-height: 1.4 !important;
+        font-size: 0.67rem !important;
+    color: rgba(255,230,180,0.90) !important;
+    line-height: 1.4 !important;
+    display: block;
             }
 
             /* 신뢰 지표 — 한 줄 */

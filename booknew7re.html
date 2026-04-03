@@ -722,14 +722,20 @@ input[type="checkbox"] { accent-color: var(--brand-blue); cursor: pointer; width
   margin: 40px auto;
   max-width: 480px;
 }
-.stat { flex:1; padding:16px 8px; position:relative; }
+.stat { flex:1; padding:16px 8px; position:relative; 
+  display: flex;           /* Flexbox 레이아웃 활성화 */
+  flex-direction: column;  /* 제목과 내용을 위아래로 배치 */
+  align-items: center;     /* 가로(수평) 방향 정중앙 정렬 */
+  justify-content: center; /* 세로(수직) 방향 정중앙 정렬 */
+  text-align: center;
+}
 .stat:not(:last-child)::after {
   content:''; position:absolute;
   right:0; top:20%; height:60%; width:1px;
   background:rgba(0,0,0,0.05);
 }
-.stat-n { font-size:24px; font-weight:800; color:#191F28; display:block; margin-bottom:2px; }
-.stat-l { font-size:13px; color:#4E5968; font-weight:600; }
+.stat-n { font-size:24px; font-weight:800; color:#191F28; display:block; margin-bottom:4px; line-height: 1.2; }
+.stat-l { font-size:13px; color:#4E5968; font-weight:600; line-height: 1.2; }
 
 .btn-hero-new {
   display: inline-flex;
@@ -926,7 +932,7 @@ input[type="checkbox"] { accent-color: var(--brand-blue); cursor: pointer; width
     <div class="stats-wrapper">
       <div class="stat"><span class="stat-n">가맹비</span><span class="stat-l">없음</span></div>
       <div class="stat"><span class="stat-n">약정 기간</span><span class="stat-l">없음</span></div>
-      <div class="stat"><span class="stat-n">해지 위약금</span><span class="stat-l">없음</span></div>
+      <div class="stat"><span class="stat-n">위약금</span><span class="stat-l">없음</span></div>
     </div>
 
     <button class="btn-hero-new" id="heroCtaBtn"> 무료체험 바로가기</button>
@@ -969,7 +975,7 @@ input[type="checkbox"] { accent-color: var(--brand-blue); cursor: pointer; width
 <section class="faq-section">
   <div class="faq-right-col">
     <span class="faq-label">자주 묻는 질문</span>
-    <h2 class="faq-heading">신청 전에<br>걱정되는 것들</h2>
+    <h2 class="faq-heading">신청 전에 걱정되는 것들</h2>
     <div class="mascot-wrap">
       <img class="mascot-img" src="doki2.png">
     </div>

@@ -550,22 +550,38 @@ function positionOverlays(index) {
   // SVG dim-overlay: 어두운 배경에 각 하이라이트 구멍 뚫기
   const hlOvs = overlays.filter(o => o.highlight);
   if (hlOvs.length > 0) {
-    // SVG mask 대신 CSS clip-path:path() 사용 — GitHub 등 원격 서빙에서도 안전
-    const W = ar.width, H = ar.height;
-    // 바깥 사각형(시계 방향) + 각 하이라이트 구멍(반시계 방향) → nonzero 규칙으로 구멍 형성
-    let pathD = `M 0 0 L ${W} 0 L ${W} ${H} L 0 ${H} Z`;
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.className.baseVal = 'dim-svg';
+    svg.style.width  = ar.width  + 'px';
+    svg.style.height = ar.height + 'px';
+    const maskId = 'spotlight-mask-' + index;
+    const defs = document.createElementNS(svgNS, 'defs');
+    const mask = document.createElementNS(svgNS, 'mask');
+    mask.setAttribute('id', maskId);
+    const bgR = document.createElementNS(svgNS, 'rect');
+    bgR.setAttribute('width', ar.width); bgR.setAttribute('height', ar.height);
+    bgR.setAttribute('fill', 'white');
+    mask.appendChild(bgR);
     hlOvs.forEach(o => {
-      const hx = Math.round(offX + imgW*o.highlight.x/100 - 4);
-      const hy = Math.round(offY + imgH*o.highlight.y/100 - 4);
-      const hw = Math.round(imgW*o.highlight.w/100 + 8);
-      const hh = Math.round(imgH*o.highlight.h/100 + 8);
-      // 반시계 방향 (구멍)
-      pathD += ` M ${hx} ${hy} L ${hx} ${hy+hh} L ${hx+hw} ${hy+hh} L ${hx+hw} ${hy} Z`;
+      const hx = offX + imgW*o.highlight.x/100 - 4;
+      const hy = offY + imgH*o.highlight.y/100 - 4;
+      const hw = imgW*o.highlight.w/100 + 8;
+      const hh = imgH*o.highlight.h/100 + 8;
+      const hole = document.createElementNS(svgNS, 'rect');
+      hole.setAttribute('x', hx); hole.setAttribute('y', hy);
+      hole.setAttribute('width', hw); hole.setAttribute('height', hh);
+      hole.setAttribute('rx', '13'); hole.setAttribute('ry', '13');
+      hole.setAttribute('fill', 'black');
+      mask.appendChild(hole);
     });
-    const dimDiv = document.createElement('div');
-    dimDiv.className = 'dim-svg';
-    dimDiv.style.cssText = `position:absolute;left:0;top:0;width:${W}px;height:${H}px;background:rgba(15,22,40,0.76);pointer-events:none;z-index:5;clip-path:path('${pathD}');`;
-    area.appendChild(dimDiv);
+    defs.appendChild(mask); svg.appendChild(defs);
+    const dark = document.createElementNS(svgNS, 'rect');
+    dark.setAttribute('width', ar.width); dark.setAttribute('height', ar.height);
+    dark.setAttribute('fill', 'rgba(15,22,40,0.76)');
+    dark.setAttribute('mask', 'url(#' + maskId + ')');
+    svg.appendChild(dark);
+    area.appendChild(svg);
   }
 
   overlays.forEach((ov, ovIdx) => {
@@ -647,23 +663,25 @@ function positionOverlays(index) {
     }
   });
 
-  // clip-path dim-overlay에 secondaryHints 구멍 추가
+  // SVG dim-overlay에도 secondaryHints 구멍 추가
   if (hlOvs.length > 0 && hints.length > 0) {
-    const dimDiv = area.querySelector('.dim-svg');
-    if (dimDiv) {
-      // 기존 clip-path path 데이터를 가져와서 구멍 추가
-      const existing = dimDiv.style.clipPath || '';
-      const pathMatch = existing.match(/path\('(.+)'\)/);
-      if (pathMatch) {
-        let pathD = pathMatch[1];
+    const svgEl = area.querySelector('.dim-svg');
+    if (svgEl) {
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const maskEl = svgEl.querySelector('mask');
+      if (maskEl) {
         hints.forEach(sh => {
-          const hx = Math.round(offX + imgW*sh.x/100 - 4);
-          const hy = Math.round(offY + imgH*sh.y/100 - 4);
-          const hw = Math.round(imgW*sh.w/100 + 8);
-          const hh = Math.round(imgH*sh.h/100 + 8);
-          pathD += ` M ${hx} ${hy} L ${hx} ${hy+hh} L ${hx+hw} ${hy+hh} L ${hx+hw} ${hy} Z`;
+          const hx = offX + imgW*sh.x/100 - 4;
+          const hy = offY + imgH*sh.y/100 - 4;
+          const hw = imgW*sh.w/100 + 8;
+          const hh = imgH*sh.h/100 + 8;
+          const hole = document.createElementNS(svgNS, 'rect');
+          hole.setAttribute('x', hx); hole.setAttribute('y', hy);
+          hole.setAttribute('width', hw); hole.setAttribute('height', hh);
+          hole.setAttribute('rx', '13'); hole.setAttribute('ry', '13');
+          hole.setAttribute('fill', 'black');
+          maskEl.appendChild(hole);
         });
-        dimDiv.style.clipPath = `path('${pathD}')`;
       }
     }
   }
